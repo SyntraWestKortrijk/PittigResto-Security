@@ -1,0 +1,99 @@
+﻿using Pittig.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Pittig.Utility
+{
+    public static class SD
+    {
+        public const string DefaultFoodImage = "default_food.png";
+
+
+        public const string ManagerUser = "Manager";
+        public const string KitchenUser = "Kitchen";
+        public const string FrontDeskUser = "FrontDesk";
+        public const string CustomerEndUser = "Customer";
+
+        public const string ssShoppingCartCount = "ssCartCount";
+        public const string ssCouponCode = "ssCouponCode";
+
+        public const string StatusSubmitted = "Verstuurd";
+        public const string StatusInProcess = "In bereiding";
+        public const string StatusReady = "Klaar voor ophaling";
+        public const string StatusCompleted = "Afgehandeld";
+        public const string StatusCancelled = "Geannuleerd";
+
+        public const string PaymentStatusPending = "In Behandeling";
+        public const string PaymentStatusApproved = "Goedgekeurd";
+        public const string PaymentStatusRejected = "Afgewezen";
+
+
+
+
+
+
+
+
+
+        public static string ConvertToRawHtml(string source)
+        {
+            char[] array = new char[source.Length];
+            int arrayIndex = 0;
+            bool inside = false;
+
+            for (int i = 0; i < source.Length; i++)
+            {
+                char let = source[i];
+                if (let == '<')
+                {
+                    inside = true;
+                    continue;
+                }
+                if (let == '>')
+                {
+                    inside = false;
+                    continue;
+                }
+                if (!inside)
+                {
+                    array[arrayIndex] = let;
+                    arrayIndex++;
+                }
+            }
+            return new string(array, 0, arrayIndex);
+        }
+
+        public static double DiscountedPrice(Coupon couponFromDb, double OriginalOrderTotal)
+        {
+            if(couponFromDb==null)
+            {
+                return OriginalOrderTotal;
+            }
+            else
+            {
+                if(couponFromDb.MinimumAmount > OriginalOrderTotal)
+                {
+                    return OriginalOrderTotal;
+                }
+                else
+                {
+                    //everything is valid
+                    if(Convert.ToInt32(couponFromDb.CouponType) == (int)Coupon.ECouponType.Euro)
+                    {
+                        //10 van 100
+                        return Math.Round(OriginalOrderTotal - couponFromDb.Discount, 2);
+                    }
+                        if (Convert.ToInt32(couponFromDb.CouponType) == (int)Coupon.ECouponType.Percent)
+                        {
+                        //10% van 100
+                        return Math.Round(OriginalOrderTotal - (OriginalOrderTotal* couponFromDb.Discount/100), 2);
+                    }
+                }
+            }
+            return OriginalOrderTotal;
+        }
+
+    }
+}
